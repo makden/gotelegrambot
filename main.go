@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -13,12 +15,18 @@ func main() {
 	botToken := "5178242009:AAHbLC1Gk4l42kTt4Tx_6qcTA_WyLW-aBxA"
 	botApi := "https://api.telegram.org/bot"
 	botUrl := botApi + botToken
+	offset := 0
 
 	for {
-		updates, err := getUpdates(botUrl)
+		updates, err := getUpdates(botUrl, offset)
 
 		if err != nil {
 			log.Println("Error while updating", err.Error())
+		}
+
+		for _, update := range updates {
+			err = respond(botUrl, update)
+			offset = update.UpdateId + 1
 		}
 
 		fmt.Println(updates)
@@ -26,10 +34,8 @@ func main() {
 
 }
 
-func getUpdates(botUrl string) ([]Update, error) {
-	resp, err := http.Get(botUrl + "/getUpdates")
-
-	fmt.Println(botUrl + "/getUpdates")
+func getUpdates(botUrl string, offset int) ([]Update, error) {
+	resp, err := http.Get(botUrl + "/getUpdates" + "?offset=" + strconv.Itoa(offset))
 
 	if err != nil {
 		return nil, err
@@ -52,6 +58,21 @@ func getUpdates(botUrl string) ([]Update, error) {
 	return res.Result, nil
 }
 
-func respond() {
+func respond(botUrl string, update Update) error {
+	var BotMes BotMessage
+	BotMes.ChatId = update.Message.Chat.ChatId
+	BotMes.Text = update.Message.Text
+	buf, err := json.Marshal(BotMes)
 
+	if err != nil {
+		return err
+	}
+
+	_, err = http.Post(botUrl+"/sendMessage", "application/json", bytes.NewBuffer(buf))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
