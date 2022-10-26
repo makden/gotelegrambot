@@ -12,9 +12,8 @@ import (
 
 func main() {
 
-	botToken := "5178242009:AAHbLC1Gk4l42kTt4Tx_6qcTA_WyLW-aBxA"
-	botApi := "https://api.telegram.org/bot"
-	botUrl := botApi + botToken
+	var conf Configs
+	botUrl := conf.Auth.Api + conf.Auth.Token
 	offset := 0
 
 	for {
