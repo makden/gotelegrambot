@@ -11,8 +11,11 @@ import (
 )
 
 func main() {
-
 	var conf Configs
+
+	conf.Auth.Token = "5178242009:AAHbLC1Gk4l42kTt4Tx_6qcTA_WyLW-aBxA"
+	conf.Auth.Api = "https://api.telegram.org/bot"
+
 	botUrl := conf.Auth.Api + conf.Auth.Token
 	offset := 0
 
